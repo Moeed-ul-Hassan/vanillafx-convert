@@ -132,35 +132,46 @@
     border: 1px solid hsl(var(--glass-border));
     backdrop-filter: blur(20px);
     box-shadow: var(--shadow-card);
+    @apply transition-all duration-500 hover:scale-[1.02];
   }
 
   .currency-input {
     @apply bg-input border-border text-foreground placeholder:text-muted-foreground;
     @apply focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
-    @apply transition-all duration-300;
+    @apply transition-all duration-300 hover:border-primary/50;
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.1);
   }
 
   .currency-select {
     @apply bg-input border-border text-foreground;
     @apply focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
-    @apply transition-all duration-300;
+    @apply transition-all duration-300 hover:border-primary/50;
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.1);
   }
 
   .swap-button {
     @apply bg-accent hover:bg-accent/80 text-accent-foreground;
-    @apply transition-all duration-300 hover:scale-105 hover:shadow-lg;
+    @apply transition-all duration-300 hover:scale-110 hover:shadow-lg hover:rotate-180;
     box-shadow: var(--shadow-glow);
   }
 
   .convert-button {
     @apply text-primary-foreground font-semibold;
     background: var(--gradient-primary);
-    @apply transition-all duration-300 hover:scale-105;
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl;
     box-shadow: var(--shadow-glow);
+    @apply relative overflow-hidden;
+  }
+  
+  .convert-button:hover::before {
+    @apply absolute inset-0 bg-white/10 animate-pulse;
+    content: '';
   }
 
   .result-display {
     @apply bg-secondary/10 border border-secondary/20 text-foreground;
-    @apply backdrop-blur-sm;
+    @apply backdrop-blur-sm transition-all duration-500 hover:bg-secondary/15;
+    box-shadow: 0 8px 24px hsl(var(--secondary) / 0.2);
+    @apply animate-in fade-in-0 slide-in-from-bottom-4;
   }
 }

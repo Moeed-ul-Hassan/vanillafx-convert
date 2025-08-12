@@ -44,11 +44,14 @@ export const CurrencyConverter = () => {
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const { toast } = useToast();
 
-  // Fetch exchange rates from API
+// FreeCurrencyAPI.com integration
+  const API_KEY = 'fca_live_NRAm4zg5x4Kis7exUUbRc8amSCOsdMxrsMTRFcO8';
+  
+  // Fetch exchange rates from FreeCurrencyAPI
   const fetchExchangeRate = async (from: string, to: string): Promise<number> => {
     try {
       setIsLoading(true);
-      const response = await fetch(`https://api.exchangerate.host/latest?base=${from}&symbols=${to}`);
+      const response = await fetch(`https://api.freecurrencyapi.com/v1/latest?apikey=${API_KEY}&base_currency=${from}&currencies=${to}`);
       
       if (!response.ok) {
         throw new Error('API request failed');
@@ -56,8 +59,8 @@ export const CurrencyConverter = () => {
       
       const data = await response.json();
       
-      if (data.success && data.rates && data.rates[to]) {
-        return data.rates[to];
+      if (data.data && data.data[to]) {
+        return data.data[to];
       } else {
         throw new Error('Invalid API response');
       }
@@ -142,48 +145,48 @@ export const CurrencyConverter = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md glass-card border-0">
-        <CardHeader className="text-center pb-6">
-          <div className="mx-auto w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-            <DollarSign className="w-6 h-6 text-primary" />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-card to-muted/20">
+      <Card className="w-full max-w-lg glass-card border-0 shadow-2xl">
+        <CardHeader className="text-center pb-8">
+          <div className="mx-auto w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-6 shadow-glow">
+            <DollarSign className="w-8 h-8 text-primary animate-pulse" />
           </div>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Currency Converter
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent mb-2">
+            Currency Exchange
           </CardTitle>
-          <p className="text-muted-foreground">
-            Convert currencies with live exchange rates
+          <p className="text-muted-foreground text-lg">
+            Real-time exchange rates powered by FreeCurrencyAPI
           </p>
         </CardHeader>
         
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8 p-8">
           {/* Amount Input */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Amount</label>
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-foreground tracking-wide uppercase">Amount</label>
             <Input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Enter amount"
-              className="currency-input text-lg font-semibold"
+              className="currency-input text-xl font-bold h-14 text-center"
               min="0"
               step="0.01"
             />
           </div>
 
           {/* From Currency */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">From</label>
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-foreground tracking-wide uppercase">From Currency</label>
             <Select value={fromCurrency} onValueChange={setFromCurrency}>
-              <SelectTrigger className="currency-select">
+              <SelectTrigger className="currency-select h-14 text-lg">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {CURRENCIES.map((currency) => (
                   <SelectItem key={currency.code} value={currency.code}>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono">{currency.symbol}</span>
-                      <span>{currency.code}</span>
+                    <div className="flex items-center gap-3 py-2">
+                      <span className="font-mono text-lg">{currency.symbol}</span>
+                      <span className="font-semibold">{currency.code}</span>
                       <span className="text-muted-foreground">- {currency.name}</span>
                     </div>
                   </SelectItem>
@@ -193,31 +196,31 @@ export const CurrencyConverter = () => {
           </div>
 
           {/* Swap Button */}
-          <div className="flex justify-center">
+          <div className="flex justify-center -my-2">
             <Button
               variant="outline"
               size="icon"
               onClick={swapCurrencies}
-              className="swap-button rounded-full"
+              className="swap-button rounded-full w-12 h-12 border-2"
               disabled={isLoading}
             >
-              <ArrowUpDown className="w-4 h-4" />
+              <ArrowUpDown className="w-5 h-5" />
             </Button>
           </div>
 
           {/* To Currency */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">To</label>
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-foreground tracking-wide uppercase">To Currency</label>
             <Select value={toCurrency} onValueChange={setToCurrency}>
-              <SelectTrigger className="currency-select">
+              <SelectTrigger className="currency-select h-14 text-lg">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {CURRENCIES.map((currency) => (
                   <SelectItem key={currency.code} value={currency.code}>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono">{currency.symbol}</span>
-                      <span>{currency.code}</span>
+                    <div className="flex items-center gap-3 py-2">
+                      <span className="font-mono text-lg">{currency.symbol}</span>
+                      <span className="font-semibold">{currency.code}</span>
                       <span className="text-muted-foreground">- {currency.name}</span>
                     </div>
                   </SelectItem>
@@ -230,24 +233,34 @@ export const CurrencyConverter = () => {
           <Button
             onClick={convertCurrency}
             disabled={isLoading || !amount}
-            className="w-full convert-button py-6 text-lg"
+            className="w-full convert-button py-8 text-xl font-bold tracking-wide"
           >
-            {isLoading ? 'Converting...' : 'Convert'}
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
+                Converting...
+              </div>
+            ) : (
+              'Convert Currency'
+            )}
           </Button>
 
           {/* Result Display */}
           {convertedAmount !== null && exchangeRate !== null && (
-            <div className="result-display rounded-lg p-4 space-y-2">
+            <div className="result-display rounded-xl p-6 space-y-4 border-2">
               <div className="text-center">
-                <div className="text-3xl font-bold text-secondary">
+                <div className="text-4xl font-bold text-secondary mb-3">
                   {getCurrencySymbol(toCurrency)} {formatNumber(convertedAmount)}
                 </div>
-                <div className="text-sm text-muted-foreground mt-2">
+                <div className="text-base text-muted-foreground bg-muted/20 rounded-lg p-3 mb-2">
                   1 {fromCurrency} = {formatNumber(exchangeRate)} {toCurrency}
                 </div>
                 {lastUpdated && (
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Last updated: {lastUpdated}
+                  <div className="text-sm text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      Last updated: {lastUpdated}
+                    </span>
                   </div>
                 )}
               </div>
